@@ -1,0 +1,22 @@
+# Dependencies
+node_modules
+
+# Next.js
+.next
+
+# Git
+.git
+.gitignore
+
+# Environment
+.env.local
+.env.*
+
+# Logs
+npm-debug.log
+
+# Documentation
+README.md
+
+# Testing
+coverage

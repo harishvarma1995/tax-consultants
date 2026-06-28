@@ -1,36 +1,48 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# ------------------------------------------------------------
+# TAX CONSULTANTS
+# Git Ignore Rules
+# ------------------------------------------------------------
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
+# Dependencies
+node_modules/
 
-# testing
-/coverage
+# Next.js build output
+.next/
+out/
 
-# next.js
-/.next/
-/out/
+# Production build
+build/
 
-# production
-/build
+# Environment variables
+.env.local
+.env.*.local
 
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 
-# local env files
-.env*.local
+# Operating System
+.DS_Store
+Thumbs.db
 
-# vercel
-.vercel
+# VS Code
+.vscode/settings.json
 
-# typescript
+# Testing
+coverage/
+
+# TypeScript
 *.tsbuildinfo
-next-env.d.ts
+
+# Docker
+docker-data/
+*.pid
+
+# Vercel
+.vercel/
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
