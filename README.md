@@ -37,3 +37,5 @@ http://localhost:3000
 ## License
 
 To be decided.
+
+Development branch initialized.
