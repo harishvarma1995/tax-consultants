@@ -1,20 +1,15 @@
-/// ===============================================================
 /// Prisma Schema
 /// Project: Tax Consultants
 /// Database: Supabase PostgreSQL
 /// ORM: Prisma
-///
-/// This file defines the complete database structure.
-/// Every table, relationship, enum and constraint is managed here.
-/// ===============================================================
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
@@ -50,22 +45,22 @@ enum BookingStatus {
 }
 
 model User {
-  id            String   @id @default(cuid())
-  email         String   @unique
-  passwordHash  String
-  role          UserRole @default(CLIENT)
-  emailVerified Boolean  @default(false)
-  phone         String?
-  fullName      String
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id               String          @id @default(cuid())
+  email            String          @unique
+  passwordHash     String
+  role             UserRole        @default(CLIENT)
+  emailVerified    Boolean         @default(false)
+  phone            String?
+  fullName         String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
 
-  clientProfile   ClientProfile?
-  documents       Document[] @relation("ClientDocuments")
-  bookings        Booking[]  @relation("ClientBookings")
-  sentMessages    Message[]  @relation("MessageSender")
-  receivedMessages Message[] @relation("MessageReceiver")
-  auditLogs       AuditLog[] @relation("AdminAuditLogs")
+  clientProfile    ClientProfile?
+  documents        Document[]      @relation("ClientDocuments")
+  bookings         Booking[]       @relation("ClientBookings")
+  sentMessages     Message[]       @relation("MessageSender")
+  receivedMessages Message[]       @relation("MessageReceiver")
+  auditLogs        AuditLog[]      @relation("AdminAuditLogs")
 
   @@index([email])
   @@index([role])
@@ -90,10 +85,20 @@ model ClientProfile {
   @@index([caseStatus])
 }
 
+model TaxYear {
+  id        String     @id @default(cuid())
+  year      Int        @unique
+  status    String     @default("OPEN")
+  documents Document[]
+}
+
 model Document {
   id          String           @id @default(cuid())
   clientId    String
   client      User             @relation("ClientDocuments", fields: [clientId], references: [id], onDelete: Cascade)
+
+  taxYearId   String?          
+  taxYear     TaxYear?         @relation(fields: [taxYearId], references: [id])
 
   fileName    String
   storagePath String
@@ -105,6 +110,7 @@ model Document {
   @@index([clientId])
   @@index([category])
   @@index([uploadedAt])
+  @@index([taxYearId])
 }
 
 model Booking {
@@ -128,13 +134,10 @@ model Booking {
 
 model Message {
   id         String   @id @default(cuid())
-
   senderId   String
   receiverId String
-
   sender     User     @relation("MessageSender", fields: [senderId], references: [id], onDelete: Cascade)
   receiver   User     @relation("MessageReceiver", fields: [receiverId], references: [id], onDelete: Cascade)
-
   content    String
   isRead     Boolean  @default(false)
   createdAt  DateTime @default(now())
@@ -190,7 +193,6 @@ model AuditLog {
   id          String   @id @default(cuid())
   adminId     String
   admin       User     @relation("AdminAuditLogs", fields: [adminId], references: [id], onDelete: Restrict)
-
   action      String
   targetTable String
   targetId    String?
