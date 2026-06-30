@@ -1,0 +1,23 @@
+# ----------------------------------------------------------
+# TAX CONSULTANTS
+# Docker Compose Configuration
+#
+# Starts the Next.js application inside Docker.
+# ----------------------------------------------------------
+
+version: "3.9"
+
+services:
+  web:
+    container_name: tax-consultants
+
+    build:
+      context: .
+
+    ports:
+      - "3000:3000"
+
+    env_file:
+      - .env.local
+
+    restart: unless-stopped
