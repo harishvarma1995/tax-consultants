@@ -2,11 +2,11 @@
  * ============================================================
  * Project : TAX CONSULTANTS
  * File    : app/api/auth/register/route.ts
- * Purpose : Handles client account registration securely.
+ * Purpose : Handles client registration and sends email verification.
  *
- * This route validates user input, hashes the password, creates
- * a User record, creates the linked ClientProfile record, and
- * returns a safe response without exposing sensitive data.
+ * This route validates input, hashes the password, creates the
+ * User and ClientProfile records, stores a verification token,
+ * and sends the verification email.
  * ============================================================
  */
 
@@ -15,6 +15,9 @@ import bcrypt from "bcryptjs";
 import { UserRole } from "@prisma/client";
 import { z } from "zod";
 import { db } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+import { getVerificationEmailTemplate } from "@/lib/email-templates";
+import { createRawToken, createTokenExpiry, hashToken } from "@/lib/tokens";
 
 const registerSchema = z
   .object({
@@ -63,7 +66,13 @@ export async function POST(req: Request) {
       );
     }
 
+    const rawVerificationToken = createRawToken();
+    const verificationTokenHash = hashToken(rawVerificationToken);
+    const verificationExpires = createTokenExpiry(24);
     const passwordHash = await bcrypt.hash(password, 12);
+
+    const baseUrl = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+    const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${rawVerificationToken}`;
 
     await db.user.create({
       data: {
@@ -71,6 +80,8 @@ export async function POST(req: Request) {
         passwordHash,
         role: UserRole.CLIENT,
         emailVerified: false,
+        emailVerificationTokenHash: verificationTokenHash,
+        emailVerificationExpires: verificationExpires,
         fullName,
         phone,
         clientProfile: {
@@ -81,6 +92,14 @@ export async function POST(req: Request) {
           },
         },
       },
+    });
+
+    const html = getVerificationEmailTemplate(verifyUrl, fullName);
+
+    await sendEmail({
+      to: normalizedEmail,
+      subject: "Verify your Tax Consultants account",
+      html,
     });
 
     return NextResponse.json(

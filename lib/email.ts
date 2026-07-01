@@ -32,6 +32,8 @@ export async function sendEmail({ to, subject, html }: SendEmailParams) {
       html: html,
     });
 
+  
+
     return { success: true, data };
   } catch (error) {
     console.error("Failed to send email via Resend:", error);

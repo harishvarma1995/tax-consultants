@@ -25,9 +25,17 @@ function LoginForm() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const errorParam = searchParams.get("error");
+
+    const verifiedParam = searchParams.get("verified");
+
+    if (verifiedParam === "true") {
+      setError("Email verified successfully. You can now log in.");
+      return;
+    }
 
     if (errorParam === "EmailNotVerified") {
       setError("Please verify your email before logging in.");
@@ -116,10 +124,19 @@ function LoginForm() {
               id="password"
               name="password"
               required
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
             />
+
+            <button
+             type="button"
+             onClick={() => setShowPassword((previous) => !previous)}
+             className="mt-2 text-sm font-medium text-slate-700 hover:underline"
+>
+             {showPassword ? "Hide" : "Show"} Password
+            </button>
+
           </div>
 
           <div className="flex items-center justify-between gap-4 text-sm">

@@ -3,9 +3,6 @@
  * Project : TAX CONSULTANTS
  * File    : app/(auth)/register/page.tsx
  * Purpose : Renders the client registration form.
- *
- * This page collects user details, validates password strength
- * visually, and sends registration data to the server API.
  * ============================================================
  */
 
@@ -38,9 +35,12 @@ export default function RegisterPage() {
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<FormMessage | null>(null);
+  const [registrationComplete, setRegistrationComplete] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState("");
 
   const passwordStrength = useMemo(
     () => getPasswordStrength(password),
@@ -49,7 +49,6 @@ export default function RegisterPage() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     setLoading(true);
     setMessage(null);
 
@@ -81,20 +80,21 @@ export default function RegisterPage() {
           "Registration successful. Please check your email.",
       });
 
+      setRegisteredEmail(email);
+      setRegistrationComplete(true);
+
       setFullName("");
       setEmail("");
       setPhone("");
       setPassword("");
       setConfirmPassword("");
     } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Something went wrong. Please try again.";
-
       setMessage({
         type: "error",
-        text: errorMessage,
+        text:
+          error instanceof Error
+            ? error.message
+            : "Something went wrong. Please try again.",
       });
     } finally {
       setLoading(false);
@@ -112,7 +112,7 @@ export default function RegisterPage() {
           Register to access your secure tax consultation portal.
         </p>
 
-        {message ? (
+        {message && !registrationComplete ? (
           <div
             className={`mb-4 rounded-md border p-3 text-sm ${
               message.type === "success"
@@ -124,105 +124,168 @@ export default function RegisterPage() {
           </div>
         ) : null}
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="fullName">
-              Full Name
-            </label>
-            <input
-              className="w-full rounded-md border px-3 py-2 text-sm"
-              id="fullName"
-              name="fullName"
-              required
-              type="text"
-              value={fullName}
-              onChange={(event) => setFullName(event.target.value)}
-            />
-          </div>
+        {registrationComplete ? (
+          <div className="rounded-md border border-green-200 bg-green-50 p-5 text-center">
+            <h2 className="text-xl font-semibold text-green-800">
+              Registration Successful!
+            </h2>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="email">
-              Email Address
-            </label>
-            <input
-              className="w-full rounded-md border px-3 py-2 text-sm"
-              id="email"
-              name="email"
-              required
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-            />
-          </div>
+            <p className="mt-3 text-sm text-green-700">
+              We sent a verification email to:
+            </p>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="phone">
-              Phone
-            </label>
-            <input
-              className="w-full rounded-md border px-3 py-2 text-sm"
-              id="phone"
-              name="phone"
-              required
-              type="tel"
-              value={phone}
-              onChange={(event) => setPhone(event.target.value)}
-            />
-          </div>
+            <p className="mt-2 break-all font-medium text-green-900">
+              {registeredEmail}
+            </p>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium" htmlFor="password">
-              Password
-            </label>
-            <input
-              className="w-full rounded-md border px-3 py-2 text-sm"
-              id="password"
-              name="password"
-              required
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-            {password ? (
-              <p className="mt-1 text-xs text-gray-600">
-                Strength: {passwordStrength}
-              </p>
-            ) : null}
-          </div>
+            <p className="mt-3 text-sm text-green-700">
+              Please verify your email before logging in.
+            </p>
 
-          <div>
-            <label
-              className="mb-1 block text-sm font-medium"
-              htmlFor="confirmPassword"
+            <Link
+              className="mt-5 inline-block rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+              href="/login"
             >
-              Confirm Password
-            </label>
-            <input
-              className="w-full rounded-md border px-3 py-2 text-sm"
-              id="confirmPassword"
-              name="confirmPassword"
-              required
-              type="password"
-              value={confirmPassword}
-              onChange={(event) => setConfirmPassword(event.target.value)}
-            />
+              Go to Login
+            </Link>
           </div>
+        ) : (
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label
+                className="mb-1 block text-sm font-medium"
+                htmlFor="fullName"
+              >
+                Full Name
+              </label>
+              <input
+                className="w-full rounded-md border px-3 py-2 text-sm"
+                id="fullName"
+                name="fullName"
+                required
+                type="text"
+                value={fullName}
+                onChange={(event) => setFullName(event.target.value)}
+              />
+            </div>
 
-          <button
-            className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
-            disabled={loading}
-            type="submit"
-          >
-            {loading ? "Creating Account..." : "Register"}
-          </button>
-        </form>
+            <div>
+              <label
+                className="mb-1 block text-sm font-medium"
+                htmlFor="email"
+              >
+                Email Address
+              </label>
+              <input
+                className="w-full rounded-md border px-3 py-2 text-sm"
+                id="email"
+                name="email"
+                required
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </div>
 
-        <p className="mt-4 text-center text-sm text-gray-600">
-          Already have an account?{" "}
-          <Link className="font-medium text-slate-900 underline" href="/login">
-            Login here
-          </Link>
-        </p>
+            <div>
+              <label
+                className="mb-1 block text-sm font-medium"
+                htmlFor="phone"
+              >
+                Phone
+              </label>
+              <input
+                className="w-full rounded-md border px-3 py-2 text-sm"
+                id="phone"
+                name="phone"
+                required
+                type="tel"
+                value={phone}
+                onChange={(event) => setPhone(event.target.value)}
+              />
+            </div>
+
+            <div>
+              <label
+                className="mb-1 block text-sm font-medium"
+                htmlFor="password"
+              >
+                Password
+              </label>
+              <input
+                className="w-full rounded-md border px-3 py-2 text-sm"
+                id="password"
+                name="password"
+                required
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+              />
+
+              <button
+                className="mt-2 text-sm font-medium text-slate-700 hover:underline"
+                type="button"
+                onClick={() => setShowPassword((previous) => !previous)}
+              >
+                {showPassword ? "Hide" : "Show"} Password
+              </button>
+
+              {password ? (
+                <p className="mt-1 text-xs text-gray-600">
+                  Strength: {passwordStrength}
+                </p>
+              ) : null}
+            </div>
+
+            <div>
+              <label
+                className="mb-1 block text-sm font-medium"
+                htmlFor="confirmPassword"
+              >
+                Confirm Password
+              </label>
+              <input
+                className="w-full rounded-md border px-3 py-2 text-sm"
+                id="confirmPassword"
+                name="confirmPassword"
+                required
+                type={showConfirmPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+              />
+
+              <button
+                className="mt-2 text-sm font-medium text-slate-700 hover:underline"
+                type="button"
+                onClick={() =>
+                  setShowConfirmPassword((previous) => !previous)
+                }
+              >
+                {showConfirmPassword ? "Hide" : "Show"} Confirm Password
+              </button>
+            </div>
+
+            <button
+              className="w-full rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-70"
+              disabled={loading}
+              type="submit"
+            >
+              {loading ? "Creating Account..." : "Register"}
+            </button>
+          </form>
+        )}
+
+        {!registrationComplete ? (
+          <p className="mt-4 text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <Link
+              className="font-medium text-slate-900 underline"
+              href="/login"
+            >
+              Login here
+            </Link>
+          </p>
+        ) : null}
       </section>
     </main>
   );

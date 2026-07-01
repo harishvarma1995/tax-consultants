@@ -49,11 +49,15 @@ model User {
   email            String          @unique
   passwordHash     String
   role             UserRole        @default(CLIENT)
-  emailVerified    Boolean         @default(false)
-  phone            String?
-  fullName         String
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  emailVerified                Boolean   @default(false)
+  emailVerificationTokenHash   String?
+  emailVerificationExpires     DateTime?
+  passwordResetTokenHash       String?
+  passwordResetExpires         DateTime?
+  phone                        String?
+  fullName                     String
+  createdAt                    DateTime  @default(now())
+  updatedAt                    DateTime  @updatedAt
 
   clientProfile    ClientProfile?
   documents        Document[]      @relation("ClientDocuments")
@@ -64,6 +68,8 @@ model User {
 
   @@index([email])
   @@index([role])
+  @@index([emailVerificationTokenHash])
+  @@index([passwordResetTokenHash])
 }
 
 model ClientProfile {
