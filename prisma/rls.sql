@@ -1,0 +1,30 @@
+-- ============================================================
+-- Project : TAX CONSULTANTS
+-- File    : prisma/rls.sql
+-- Purpose : Row Level Security planning and policy SQL.
+--
+-- Important:
+-- This project uses NextAuth.js with Prisma.
+-- Prisma currently connects to Supabase PostgreSQL as the
+-- postgres database role.
+--
+-- Because of that, database RLS cannot automatically identify
+-- the logged-in NextAuth user unless the app passes user context
+-- into the database session or uses a Supabase JWT-aware client.
+--
+-- CAD-004:
+-- Do not blindly enable strict RLS policies until the app-layer
+-- user context strategy is finalized and verified.
+-- ============================================================
+
+-- Current database tables managed by Prisma:
+-- "User"
+-- "ClientProfile"
+-- "TaxYear"
+-- "Document"
+-- "Booking"
+-- "Message"
+-- "Service"
+-- "BlogPost"
+-- "SiteSettings"
+-- "AuditLog"
