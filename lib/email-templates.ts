@@ -41,3 +41,158 @@ export function getPasswordResetTemplate(resetUrl: string): string {
     </div>
   `;
 }
+/**
+ * ============================================================
+ * Booking confirmation email sent to the client.
+ * ============================================================
+ */
+export function getBookingConfirmationEmailTemplate(
+  fullName: string,
+  service: string,
+  date: string,
+  time: string
+) {
+  return `
+    <h2>Consultation Request Received</h2>
+
+    <p>Dear ${fullName},</p>
+
+    <p>
+      Thank you for scheduling a consultation with TAX CONSULTANTS.
+      Your request has been received and is awaiting confirmation.
+    </p>
+
+    <table cellpadding="6">
+      <tr>
+        <td><strong>Service</strong></td>
+        <td>${service}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Date</strong></td>
+        <td>${date}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Time</strong></td>
+        <td>${time}</td>
+      </tr>
+    </table>
+
+    <p>
+      Our team will review your request and confirm the appointment shortly.
+    </p>
+
+    <p>
+      Thank you,<br />
+      TAX CONSULTANTS
+    </p>
+  `;
+}
+
+/**
+ * ============================================================
+ * Booking notification sent to administrator.
+ * ============================================================
+ */
+export function getBookingAdminNotificationTemplate(
+  fullName: string,
+  email: string,
+  service: string,
+  date: string,
+  time: string,
+  note: string
+) {
+  return `
+    <h2>New Consultation Booking</h2>
+
+    <table cellpadding="6">
+      <tr>
+        <td><strong>Client</strong></td>
+        <td>${fullName}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Email</strong></td>
+        <td>${email}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Service</strong></td>
+        <td>${service}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Date</strong></td>
+        <td>${date}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Time</strong></td>
+        <td>${time}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Client Note</strong></td>
+        <td>${note || "None"}</td>
+      </tr>
+    </table>
+  `;
+}
+/**
+ * ============================================================
+ * Booking status update email.
+ * ============================================================
+ */
+export function getBookingStatusUpdateTemplate(
+  fullName: string,
+  service: string,
+  date: string,
+  time: string,
+  status: string,
+  adminNotes?: string
+) {
+  return `
+    <h2>Consultation Booking Update</h2>
+
+    <p>Dear ${fullName},</p>
+
+    <p>Your consultation request has been updated.</p>
+
+    <table cellpadding="6">
+      <tr>
+        <td><strong>Service</strong></td>
+        <td>${service}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Date</strong></td>
+        <td>${date}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Time</strong></td>
+        <td>${time}</td>
+      </tr>
+
+      <tr>
+        <td><strong>Status</strong></td>
+        <td>${status}</td>
+      </tr>
+
+      ${
+        adminNotes
+          ? `
+      <tr>
+        <td><strong>Admin Notes</strong></td>
+        <td>${adminNotes}</td>
+      </tr>`
+          : ""
+      }
+    </table>
+
+    <p>Thank you.</p>
+
+    <p>TAX CONSULTANTS</p>
+  `;
+}

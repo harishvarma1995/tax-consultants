@@ -18,6 +18,11 @@ enum UserRole {
   ADMIN
 }
 
+enum ClientType {
+  INDIVIDUAL
+  BUSINESS
+}
+
 enum CaseStatus {
   NEW
   IN_PROGRESS
@@ -77,6 +82,8 @@ model ClientProfile {
   userId      String     @unique
   user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  clientType  ClientType @default(INDIVIDUAL)
+
   fullName    String
   phone       String?
   panNumber   String?    @unique
@@ -84,10 +91,19 @@ model ClientProfile {
   dateOfBirth DateTime?
   caseStatus  CaseStatus @default(NEW)
   taxYear     String?
+
+  businessName          String?
+  businessPhone         String?
+  businessEmail         String?
+  businessAddress       String?
+  representativeName    String?
+  representativeRole    String?
+
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 
   @@index([userId])
+  @@index([clientType])
   @@index([caseStatus])
 }
 

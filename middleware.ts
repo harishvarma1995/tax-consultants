@@ -20,9 +20,10 @@ export default auth((req) => {
     nextUrl.pathname.startsWith("/register");
 
   const isClientRoute = nextUrl.pathname.startsWith("/client");
-  const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-
-  if (isAuthPage && isLoggedIn) {
+  const isAdminLoginPage = nextUrl.pathname.startsWith("/admin/login");
+  const isAdminRoute =
+  nextUrl.pathname.startsWith("/admin") && !isAdminLoginPage;
+  if ((isAuthPage || isAdminLoginPage) && isLoggedIn) {
     const dashboardPath =
       role === UserRole.ADMIN ? "/admin/dashboard" : "/client/dashboard";
 
