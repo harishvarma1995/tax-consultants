@@ -17,17 +17,15 @@ export default async function AdminDashboard() {
     pendingBookings,
     confirmedBookings,
     cancelledBookings,
+    totalClients,
+    totalDocuments,
   ] = await Promise.all([
     db.booking.count(),
-    db.booking.count({
-      where: { status: BookingStatus.PENDING },
-    }),
-    db.booking.count({
-      where: { status: BookingStatus.CONFIRMED },
-    }),
-    db.booking.count({
-      where: { status: BookingStatus.CANCELLED },
-    }),
+    db.booking.count({ where: { status: BookingStatus.PENDING } }),
+    db.booking.count({ where: { status: BookingStatus.CONFIRMED } }),
+    db.booking.count({ where: { status: BookingStatus.CANCELLED } }),
+    db.user.count({ where: { role: UserRole.CLIENT } }),
+    db.document.count(),
   ]);
 
   return (
@@ -35,19 +33,15 @@ export default async function AdminDashboard() {
       <header className="mb-8 flex flex-col gap-4 border-b pb-6 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-
           <p className="mt-2 text-gray-600">
-            Welcome to the TAX CONSULTANTS administration portal.
+            Central hub for managing clients, bookings, documents, and settings.
           </p>
         </div>
 
         <form
           action={async () => {
             "use server";
-
-            await signOut({
-              redirectTo: "/admin/login",
-            });
+            await signOut({ redirectTo: "/admin/login" });
           }}
         >
           <button
@@ -59,50 +53,75 @@ export default async function AdminDashboard() {
         </form>
       </header>
 
-      <section className="mb-8 grid gap-6 md:grid-cols-4">
-        <div className="rounded-lg border bg-white p-6">
-          <p className="text-sm text-gray-500">Total Bookings</p>
-          <h2 className="mt-2 text-3xl font-bold">{totalBookings}</h2>
-        </div>
-
-        <div className="rounded-lg border bg-white p-6">
-          <p className="text-sm text-gray-500">Pending</p>
-          <h2 className="mt-2 text-3xl font-bold">{pendingBookings}</h2>
-        </div>
-
-        <div className="rounded-lg border bg-white p-6">
-          <p className="text-sm text-gray-500">Confirmed</p>
-          <h2 className="mt-2 text-3xl font-bold">{confirmedBookings}</h2>
-        </div>
-
-        <div className="rounded-lg border bg-white p-6">
-          <p className="text-sm text-gray-500">Cancelled</p>
-          <h2 className="mt-2 text-3xl font-bold">{cancelledBookings}</h2>
-        </div>
+      <section className="mb-8 grid gap-6 md:grid-cols-3 xl:grid-cols-6">
+        <StatCard label="Clients" value={totalClients} />
+        <StatCard label="Documents" value={totalDocuments} />
+        <StatCard label="Bookings" value={totalBookings} />
+        <StatCard label="Pending" value={pendingBookings} />
+        <StatCard label="Confirmed" value={confirmedBookings} />
+        <StatCard label="Cancelled" value={cancelledBookings} />
       </section>
 
-      <section className="grid gap-6 md:grid-cols-2">
-        <Link
+      <section className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <HubCard
           href="/admin/bookings"
-          className="rounded-lg border bg-white p-6 shadow-sm transition hover:shadow-md"
-        >
-          <h2 className="text-xl font-semibold">Booking Management</h2>
+          title="Booking Management"
+          description="View, confirm, and cancel consultation bookings."
+        />
 
-          <p className="mt-2 text-gray-600">
-            View, confirm and cancel consultation bookings.
-          </p>
-        </Link>
+        <HubCard
+          href="/admin/documents"
+          title="Document Management"
+          description="View client-uploaded documents securely."
+        />
 
-        <div className="rounded-lg border bg-white p-6 shadow-sm opacity-60">
-          <h2 className="text-xl font-semibold">
-            Client Management
-          </h2>
+        <HubCard
+          href="/admin/clients"
+          title="Client Management"
+          description="View client profiles and service history."
+        />
 
-          <p className="mt-2 text-gray-600">
-            Coming in the next build.
-          </p>
-        </div>
+        <HubCard
+          href="/admin/messages"
+          title="Message Center"
+          description="Communicate with clients securely."
+        />
+
+        <HubCard
+          href="/admin/settings"
+          title="Website Settings"
+          description="Manage services, FAQs, office details, and booking rules."
+        />
       </section>
     </main>
+  );
+}
+
+function StatCard({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border bg-white p-6">
+      <p className="text-sm text-gray-500">{label}</p>
+      <h2 className="mt-2 text-3xl font-bold">{value}</h2>
+    </div>
+  );
+}
+
+function HubCard({
+  href,
+  title,
+  description,
+}: {
+  href: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="rounded-lg border bg-white p-6 shadow-sm transition hover:shadow-md"
+    >
+      <h2 className="text-xl font-semibold">{title}</h2>
+      <p className="mt-2 text-gray-600">{description}</p>
+    </Link>
   );
 }
